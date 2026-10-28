@@ -1,8 +1,12 @@
-import { sectionHeadings, services } from "@/lib/data";
+import type { Dictionary } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils";
 
-export function Services() {
-  const heading = sectionHeadings.services;
+interface ServicesProps {
+  copy: Dictionary;
+}
+
+export function Services({ copy }: ServicesProps) {
+  const heading = copy.sectionHeadings.services;
 
   return (
     <section id="services" className="brutal-border-b bg-brutal-white">
@@ -20,9 +24,9 @@ export function Services() {
           </h2>
         </div>
         <div className="col-span-1 grid grid-cols-1 md:col-span-9 md:grid-cols-2">
-          {services.map((service, index) => (
+          {copy.services.map((service, index) => (
             <div
-              key={service.title}
+              key={service.id}
               className={cn(
                 "group p-6 transition-colors hover:bg-brutal-yellow",
                 index < 2 && "max-md:brutal-border-b",

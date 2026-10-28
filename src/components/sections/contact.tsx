@@ -1,20 +1,23 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import { sendProposal } from "@/app/actions/contact";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { projectTypes, sectionHeadings, siteConfig } from "@/lib/data";
+import type { Locale } from "@/lib/i18n/config";
+import type {
+  ContactCopy,
+  SectionHeadingContent,
+  ServiceCopy,
+} from "@/lib/i18n/types";
 import { cn } from "@/lib/utils";
 import {
   initialContactFormState,
   type ContactFormState,
 } from "@/lib/validations";
-
-const heading = sectionHeadings.contact;
 
 // Shared brutalist override for Input / Textarea / native select
 const fieldClass =
@@ -32,47 +35,35 @@ function FieldError({ id, errors }: { id: string; errors?: string[] }) {
   );
 }
 
-export function Contact() {
+interface ContactProps {
+  locale: Locale;
+  heading: SectionHeadingContent;
+  copy: ContactCopy;
+  services: ServiceCopy[];
+}
+
+export function Contact({ locale, heading, copy, services }: ContactProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction, pending] = useActionState<
     ContactFormState,
     FormData
   >(sendProposal, initialContactFormState);
 
-  // Controlled form state to preserve values on error
-  const [formData, setFormData] = useState({
-    name: undefined as string | undefined,
-    email: undefined as string | undefined,
-    company: undefined as string | undefined,
-    projectType: undefined as string | undefined,
-    budget: undefined as string | undefined,
-    details: undefined as string | undefined,
-  });
+  const projectTypes = [
+    ...services.map((service) => service.title),
+    copy.optionOther,
+  ];
 
-  // Toast and reset on success
+  // Toast and reset on success. Inputs stay uncontrolled so a failed action
+  // preserves whatever the visitor typed without extra state.
   useEffect(() => {
     if (state.status === "success") {
       toast.success(state.message);
-      setFormData({
-        name: undefined,
-        email: undefined,
-        company: undefined,
-        projectType: undefined,
-        budget: undefined,
-        details: undefined,
-      });
+      formRef.current?.reset();
     } else if (state.status === "error" && !state.errors) {
       toast.error(state.message);
     }
   }, [state]);
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   return (
     <section id="contact" className="brutal-border-b bg-brutal-white">
@@ -99,22 +90,22 @@ export function Contact() {
             className="grid grid-cols-1 gap-6 md:grid-cols-2"
             noValidate
           >
+            <input type="hidden" name="locale" value={locale} />
+
             {/* NAME */}
             <div className="flex flex-col gap-2">
               <Label
                 htmlFor="name"
                 className="font-mono text-xs font-bold uppercase"
               >
-                NAME_ID
+                {copy.fieldLabels.name}
               </Label>
               <Input
                 id="name"
                 name="name"
                 type="text"
                 required
-                placeholder="ENTER NAME"
-                value={formData.name ?? ""}
-                onChange={handleChange}
+                placeholder={copy.placeholders.name}
                 className={fieldClass}
                 aria-invalid={!!state.errors?.name || undefined}
                 aria-describedby={state.errors?.name ? "name-error" : undefined}
@@ -128,16 +119,14 @@ export function Contact() {
                 htmlFor="email"
                 className="font-mono text-xs font-bold uppercase"
               >
-                EMAIL_ADDR
+                {copy.fieldLabels.email}
               </Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
                 required
-                placeholder="ENTER EMAIL"
-                value={formData.email ?? ""}
-                onChange={handleChange}
+                placeholder={copy.placeholders.email}
                 className={fieldClass}
                 aria-invalid={!!state.errors?.email || undefined}
                 aria-describedby={
@@ -153,15 +142,13 @@ export function Contact() {
                 htmlFor="company"
                 className="font-mono text-xs font-bold uppercase"
               >
-                COMPANY_ORG
+                {copy.fieldLabels.company}
               </Label>
               <Input
                 id="company"
                 name="company"
                 type="text"
-                placeholder="ENTER COMPANY"
-                value={formData.company ?? ""}
-                onChange={handleChange}
+                placeholder={copy.placeholders.company}
                 className={fieldClass}
               />
             </div>
@@ -172,23 +159,22 @@ export function Contact() {
                 htmlFor="projectType"
                 className="font-mono text-xs font-bold uppercase"
               >
-                PROJECT_TYPE
+                {copy.fieldLabels.projectType}
               </Label>
               <select
                 id="projectType"
                 name="projectType"
-                value={formData.projectType ?? ""}
-                onChange={handleChange}
+                defaultValue=""
                 className={cn(fieldClass, "appearance-none cursor-pointer")}
                 aria-invalid={!!state.errors?.projectType || undefined}
                 aria-describedby={
                   state.errors?.projectType ? "projectType-error" : undefined
                 }
               >
-                <option value="">SELECT MISSION TYPE</option>
-                {projectTypes.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                <option value="">{copy.placeholders.projectType}</option>
+                {projectTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
                   </option>
                 ))}
               </select>
@@ -204,15 +190,13 @@ export function Contact() {
                 htmlFor="budget"
                 className="font-mono text-xs font-bold uppercase"
               >
-                BUDGET_RANGE (USD)
+                {copy.fieldLabels.budget}
               </Label>
               <Input
                 id="budget"
                 name="budget"
                 type="text"
-                placeholder="ENTER RANGE (USD)"
-                value={formData.budget ?? ""}
-                onChange={handleChange}
+                placeholder={copy.placeholders.budget}
                 className={fieldClass}
               />
             </div>
@@ -223,16 +207,14 @@ export function Contact() {
                 htmlFor="details"
                 className="font-mono text-xs font-bold uppercase"
               >
-                PROJECT_DETAILS
+                {copy.fieldLabels.details}
               </Label>
               <Textarea
                 id="details"
                 name="details"
                 required
                 rows={4}
-                placeholder="DESCRIBE MISSION PARAMETERS"
-                value={formData.details ?? ""}
-                onChange={handleChange}
+                placeholder={copy.placeholders.details}
                 className={cn(fieldClass, "resize-none")}
                 aria-invalid={!!state.errors?.details || undefined}
                 aria-describedby={
@@ -264,7 +246,7 @@ export function Contact() {
                 disabled={pending}
                 className="w-full bg-brutal-yellow px-8 py-4 font-display text-xl font-black uppercase text-brutal-black brutal-border shadow-brutal transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-brutal-hover disabled:cursor-not-allowed disabled:opacity-60 md:w-fit"
               >
-                {pending ? "TRANSMITTING..." : "SUBMIT PROPOSAL"}
+                {pending ? copy.submitting : copy.submit}
               </button>
             </div>
           </form>

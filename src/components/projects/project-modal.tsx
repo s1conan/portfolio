@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, startTransition } from "react";
+import { startTransition, useEffect, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -11,10 +11,11 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Project } from "@/types";
+import type { ProjectModalCopy, ProjectView } from "@/lib/i18n/types";
 
 interface ProjectModalProps {
-  project: Project | null;
+  project: ProjectView | null;
+  copy: ProjectModalCopy;
   onClose: () => void;
 }
 
@@ -23,7 +24,11 @@ interface ProjectModalProps {
  * The default centered-popup styles of DialogContent are neutralized via
  * className (twMerge resolves the conflicts in favor of these overrides).
  */
-export function ProjectModal({ project, onClose }: ProjectModalProps) {
+export function ProjectModal({
+  project,
+  copy,
+  onClose,
+}: ProjectModalProps) {
   const [scrolled, setScrolled] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -38,8 +43,14 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
       img.src = src;
     };
 
-    const prevIndex = currentImageIndex === 0 ? project.images.length - 1 : currentImageIndex - 1;
-    const nextIndex = currentImageIndex === project.images.length - 1 ? 0 : currentImageIndex + 1;
+    const prevIndex =
+      currentImageIndex === 0
+        ? project.images.length - 1
+        : currentImageIndex - 1;
+    const nextIndex =
+      currentImageIndex === project.images.length - 1
+        ? 0
+        : currentImageIndex + 1;
 
     preloadImage(project.images[prevIndex]);
     preloadImage(project.images[nextIndex]);
@@ -49,7 +60,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
     if (!project) return;
     startTransition(() => {
       setCurrentImageIndex((prev) =>
-        prev === 0 ? project.images.length - 1 : prev - 1
+        prev === 0 ? project.images.length - 1 : prev - 1,
       );
     });
   };
@@ -58,7 +69,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
     if (!project) return;
     startTransition(() => {
       setCurrentImageIndex((prev) =>
-        prev === project.images.length - 1 ? 0 : prev + 1
+        prev === project.images.length - 1 ? 0 : prev + 1,
       );
     });
   };
@@ -79,7 +90,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
         className="fixed left-1/2 top-1/2 w-full max-w-7xl max-h-[85vh] -translate-x-1/2 -translate-y-1/2 grid-cols-1 max-md:grid-rows-2 gap-0 overflow-hidden rounded-none border-4 border-brutal-white bg-brutal-white p-0 ring-0 shadow-brutal-yellow sm:max-w-7xl md:grid-cols-3 md:grid-rows-1"
       >
         <DialogClose
-          aria-label="Close modal"
+          aria-label={copy.close}
           className="absolute right-0 top-0 z-10 flex h-16 w-16 items-center justify-center bg-brutal-yellow font-display text-2xl font-black text-brutal-black brutal-border-l brutal-border-b border-brutal-black transition-colors hover:bg-brutal-black hover:text-brutal-yellow"
         >
           X
@@ -101,7 +112,9 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
                     loading="lazy"
                     decoding="async"
                     className={`p-2 object-contain transition-opacity duration-200 ${
-                      index === currentImageIndex ? "opacity-100" : "opacity-0 pointer-events-none"
+                      index === currentImageIndex
+                        ? "opacity-100"
+                        : "opacity-0 pointer-events-none"
                     }`}
                   />
                 ))}
@@ -111,14 +124,14 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
                   <>
                     <button
                       onClick={goToPreviousImage}
-                      aria-label="Previous image"
+                      aria-label={copy.previousImage}
                       className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-brutal-yellow border-4 border-brutal-black text-brutal-black transition-colors hover:bg-brutal-black hover:text-brutal-yellow"
                     >
                       <ChevronLeft size={24} />
                     </button>
                     <button
                       onClick={goToNextImage}
-                      aria-label="Next image"
+                      aria-label={copy.nextImage}
                       className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-brutal-yellow border-4 border-brutal-black text-brutal-black transition-colors hover:bg-brutal-black hover:text-brutal-yellow"
                     >
                       <ChevronRight size={24} />
@@ -130,7 +143,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
                         <button
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
-                          aria-label={`Go to image ${index + 1}`}
+                          aria-label={`${copy.goToImage} ${index + 1}`}
                           className={`h-3 w-3 border-2 border-brutal-black transition-colors ${
                             index === currentImageIndex
                               ? "bg-brutal-yellow"
@@ -159,7 +172,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
                 }`}
               >
                 <div className="flex flex-col items-center gap-1 font-mono text-xs font-bold uppercase text-brutal-black/40">
-                  <span>Scroll</span>
+                  <span>{copy.scroll}</span>
                   <svg
                     className="animate-bounce"
                     width="16"
@@ -187,7 +200,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
 
                 <div>
                   <span className="mb-2 block w-fit bg-brutal-black px-2 py-1 font-mono text-xs font-bold uppercase text-brutal-white">
-                    ROLE
+                    {copy.role}
                   </span>
                   <p className="border-l-4 border-brutal-yellow pl-4 font-mono text-base font-bold uppercase">
                     {project.role}
@@ -196,7 +209,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
 
                 <div>
                   <span className="mb-2 block w-fit bg-brutal-black px-2 py-1 font-mono text-xs font-bold uppercase text-brutal-white">
-                    STACK
+                    {copy.stack}
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {project.stack.map((tech) => (
@@ -212,7 +225,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
 
                 <div>
                   <span className="mb-2 block w-fit bg-brutal-black px-2 py-1 font-mono text-xs font-bold uppercase text-brutal-white">
-                    OBJECTIVE
+                    {copy.objective}
                   </span>
                   <p className="bg-brutal-gray p-4 font-mono text-base font-bold uppercase leading-tight text-brutal-white brutal-border border-brutal-black">
                     {project.objective}
@@ -221,7 +234,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
 
                 <div>
                   <span className="mb-2 block w-fit bg-brutal-black px-2 py-1 font-mono text-xs font-bold uppercase text-brutal-white">
-                    OUTPUT
+                    {copy.output}
                   </span>
                   <ul className="space-y-2 font-mono text-sm font-bold uppercase">
                     {project.outcomes.map((outcome) => (
@@ -242,7 +255,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
           </>
         ) : (
           // Base UI requires a Title for a11y even while the dialog is closed.
-          <DialogTitle className="sr-only">Project details</DialogTitle>
+          <DialogTitle className="sr-only">{copy.closedTitle}</DialogTitle>
         )}
       </DialogContent>
     </Dialog>

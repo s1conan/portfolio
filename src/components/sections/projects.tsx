@@ -1,22 +1,39 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { ProjectCard } from "@/components/projects/project-card";
 import { ProjectModal } from "@/components/projects/project-modal";
-import { projects, sectionHeadings } from "@/lib/data";
-import type { Project } from "@/types";
+import type {
+  AriaCopy,
+  ProjectModalCopy,
+  ProjectView,
+  SectionHeadingContent,
+} from "@/lib/i18n/types";
 
-export function Projects() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+interface ProjectsProps {
+  heading: SectionHeadingContent;
+  projects: ProjectView[];
+  aria: AriaCopy;
+  modalCopy: ProjectModalCopy;
+}
+
+export function Projects({
+  heading,
+  projects,
+  aria,
+  modalCopy,
+}: ProjectsProps) {
+  const [selectedProject, setSelectedProject] = useState<ProjectView | null>(
+    null,
+  );
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const isScrollingRef = useRef(false);
   const animationRef = useRef<number | null>(null);
   const singleSetWidthRef = useRef(0);
-  const heading = sectionHeadings.projects;
 
   // Keep ref in sync with state so IntersectionObserver can read it
   useEffect(() => {
@@ -52,7 +69,7 @@ export function Projects() {
       const maxScroll = el.scrollWidth - el.clientWidth;
       singleSetWidthRef.current = Math.min(offset, maxScroll);
     }
-  }, []);
+  }, [projects.length]);
 
   // Re-measure when the scroll container resizes (viewport changes, font changes, etc.)
   // Also ensures the reset point is current even if the user resizes while scrolling.
@@ -94,7 +111,10 @@ export function Projects() {
       // or when we've scrolled to the very end (backup for narrow viewports)
       // Read ref.current live so ResizeObserver updates take effect mid-scroll
       const resetAt = singleSetWidthRef.current;
-      if (el.scrollLeft >= resetAt || el.scrollLeft + el.clientWidth >= el.scrollWidth) {
+      if (
+        el.scrollLeft >= resetAt ||
+        el.scrollLeft + el.clientWidth >= el.scrollWidth
+      ) {
         el.scrollLeft = 0;
       }
 
@@ -109,10 +129,14 @@ export function Projects() {
         animationRef.current = null;
       }
     };
-  }, [isScrolling]);
+  }, [isScrolling, measure]);
 
   return (
-    <section ref={sectionRef} id="projects" className="brutal-border-b bg-brutal-gray">
+    <section
+      ref={sectionRef}
+      id="projects"
+      className="brutal-border-b bg-brutal-gray"
+    >
       <div className="flex flex-col items-stretch brutal-border-b border-brutal-black md:flex-row">
         {/* Section label block */}
         <div className="flex flex-row md:flex-col justify-between border-brutal-black bg-brutal-yellow p-6 max-md:brutal-border-b md:w-1/4 md:p-10 md:brutal-border-r">
@@ -130,7 +154,9 @@ export function Projects() {
             type="button"
             onClick={() => setIsScrolling((prev) => !prev)}
             className="mt-20 cursor-pointer"
-            aria-label={isScrolling ? "Stop auto-scroll" : "Start auto-scroll"}
+            aria-label={
+              isScrolling ? aria.stopAutoScroll : aria.startAutoScroll
+            }
           >
             <ArrowRight
               size={36}
@@ -151,8 +177,8 @@ export function Projects() {
             <ProjectCard
               key={`${project.id}-${i}`}
               project={project}
-              index={i}
               priority={i < 3}
+              viewProjectLabel={aria.viewProject}
               onSelect={() => {
                 setIsScrolling(false);
                 setSelectedProject(project);
@@ -164,6 +190,7 @@ export function Projects() {
 
       <ProjectModal
         project={selectedProject}
+        copy={modalCopy}
         onClose={() => setSelectedProject(null)}
       />
     </section>

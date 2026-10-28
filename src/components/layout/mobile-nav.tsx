@@ -4,10 +4,30 @@ import { useEffect, useState } from "react";
 
 import { Menu, X } from "lucide-react";
 
-import { siteConfig } from "@/lib/data";
+import { LanguageToggle } from "@/components/i18n/language-toggle";
+import type { Locale } from "@/lib/i18n/config";
+import type {
+  AriaCopy,
+  LanguageCopy,
+  NavLinkContent,
+} from "@/lib/i18n/types";
 import { cn } from "@/lib/utils";
 
-export function MobileNav() {
+interface MobileNavProps {
+  locale: Locale;
+  navLinks: NavLinkContent[];
+  secureLink: string;
+  language: LanguageCopy;
+  aria: AriaCopy;
+}
+
+export function MobileNav({
+  locale,
+  navLinks,
+  secureLink,
+  language,
+  aria,
+}: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const [clickedIndex, setClickedIndex] = useState<number | null>(null);
 
@@ -32,10 +52,13 @@ export function MobileNav() {
   }, [open]);
 
   return (
-    <div className="md:hidden flex items-stretch">
+    <div className="lg:hidden flex items-stretch">
+      <div className="flex items-center px-2">
+        <LanguageToggle locale={locale} copy={language} />
+      </div>
       <button
         type="button"
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open ? aria.closeMenu : aria.openMenu}
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
         onClick={() => setOpen((previous) => !previous)}
@@ -53,7 +76,7 @@ export function MobileNav() {
           id="mobile-nav-panel"
           className="absolute left-0 right-0 top-full z-40 bg-brutal-white brutal-border-b"
         >
-          {siteConfig.navLinks.map((link, index) => (
+          {navLinks.map((link, index) => (
             <a
               key={link.href}
               href={link.href}
@@ -71,7 +94,7 @@ export function MobileNav() {
             onClick={() => setOpen(false)}
             className="block bg-brutal-black p-6 text-center font-display text-lg font-bold uppercase text-brutal-yellow brutal-border-t transition-colors hover:bg-brutal-yellow hover:text-brutal-black"
           >
-            INITIALIZE SECURE LINK
+            {secureLink}
           </a>
         </nav>
       )}

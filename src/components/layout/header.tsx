@@ -2,11 +2,27 @@
 
 import { useState } from "react";
 
+import { LanguageToggle } from "@/components/i18n/language-toggle";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { siteConfig } from "@/lib/data";
+import type { Locale } from "@/lib/i18n/config";
+import type { AriaCopy, LanguageCopy, NavLinkContent } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils";
 
-export function Header() {
+interface HeaderProps {
+  locale: Locale;
+  navLinks: NavLinkContent[];
+  secureLink: string;
+  language: LanguageCopy;
+  aria: AriaCopy;
+}
+
+export function Header({
+  locale,
+  navLinks,
+  secureLink,
+  language,
+  aria,
+}: HeaderProps) {
   const [clickedIndex, setClickedIndex] = useState<number | null>(null);
 
   const handleClick = (index: number) => {
@@ -25,15 +41,14 @@ export function Header() {
         </a>
 
         {/* w-full keeps the border-segmented cells continuous across the header */}
-        <nav className="hidden md:flex md:justify-between w-full items-stretch bg-brutal-black text-brutal-white">
-          {siteConfig.navLinks.map((link, index) => (
+        <nav className="hidden lg:flex flex-1 min-w-0 items-stretch bg-brutal-black text-brutal-white">
+          {navLinks.map((link, index) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => handleClick(index)}
               className={cn(
-                "relative flex items-center justify-center font-mono text-sm font-bold uppercase px-4 py-4 transition-colors zoom-burst hover:text-brutal-yellow min-w-[120px]",
-                index < siteConfig.navLinks.length - 1 && "",
+                "relative flex flex-1 min-w-0 items-center justify-center font-mono text-xs font-bold uppercase px-2 py-4 transition-colors zoom-burst hover:text-brutal-yellow xl:text-sm",
                 clickedIndex === index && "zoom-burst-active",
               )}
             >
@@ -42,16 +57,25 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-stretch">
+        <div className="hidden lg:flex items-stretch bg-brutal-black">
+          <div className="flex items-center px-3">
+            <LanguageToggle locale={locale} copy={language} />
+          </div>
           <a
             href="#contact"
-            className="flex items-center justify-center bg-green-800 px-3 py-6 font-display text-lg font-bold uppercase text-brutal-white brutal-border-l transition-colors hover:bg-brutal-yellow hover:text-brutal-black lg:whitespace-nowrap"
+            className="flex items-center justify-center bg-green-800 px-3 py-6 font-display text-lg font-bold uppercase text-brutal-white brutal-border-l transition-colors hover:bg-brutal-yellow hover:text-brutal-black md:min-w-[240px] md:whitespace-nowrap"
           >
-            INITIALIZE SECURE LINK
+            {secureLink}
           </a>
         </div>
 
-        <MobileNav />
+        <MobileNav
+          locale={locale}
+          navLinks={navLinks}
+          secureLink={secureLink}
+          language={language}
+          aria={aria}
+        />
       </div>
     </header>
   );

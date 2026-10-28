@@ -1,17 +1,23 @@
 import { z } from "zod";
 
-import { projectTypes } from "@/lib/data";
+import type { Dictionary } from "@/lib/i18n/types";
 
-export const contactSchema = z.object({
-  name: z.string().trim().min(1, "NAME REQUIRED"),
-  email: z.email("INVALID EMAIL FORMAT"),
-  company: z.string().optional(),
-  projectType: z.string().optional(),
-  budget: z.string().optional(),
-  details: z.string().optional(),
-});
+export function createContactSchema(
+  messages: Dictionary["contact"]["validation"],
+) {
+  return z.object({
+    name: z.string().trim().min(1, messages.nameRequired),
+    email: z.email(messages.invalidEmail),
+    company: z.string().optional(),
+    projectType: z.string().optional(),
+    budget: z.string().optional(),
+    details: z.string().optional(),
+  });
+}
 
-export type ContactFormData = z.infer<typeof contactSchema>;
+export type ContactFormData = z.infer<
+  ReturnType<typeof createContactSchema>
+>;
 
 export interface ContactFormState {
   status: "idle" | "success" | "error";

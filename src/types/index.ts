@@ -1,8 +1,3 @@
-export interface NavLink {
-  label: string;
-  href: string;
-}
-
 export interface SocialLink {
   label: string;
   href: string;
@@ -11,14 +6,7 @@ export interface SocialLink {
 
 export interface SiteConfig {
   name: string;
-  role: string;
   email: string;
-  statusBadge: string;
-  heroHeadlineTop: string;
-  heroHeadlineHighlight: string;
-  heroHeadlineBottom: string;
-  heroTagline: string;
-  navLinks: NavLink[];
   socials: SocialLink[];
 }
 
@@ -35,16 +23,11 @@ export interface SkillCategory {
   skills: Skill[];
 }
 
-export interface Project {
+/** Locale-independent parts of a project; copy lives in the i18n dictionary. */
+export interface ProjectRecord {
   id: string;
-  title: string;
-  tagline: string;
-  role: string;
   stack: string[];
-  objective: string;
-  outcomes: string[];
   images: string[];
-  imageAlt: string;
   href: string;
 }
 
@@ -54,32 +37,4 @@ export interface Certification {
   image: string;
   imageAlt: string;
   href?: string;
-}
-
-export interface ServiceItem {
-  title: string;
-  description: string;
-  items: string[];
-}
-
-export interface Benchmark {
-  metric: string;
-  value: string;
-  label: string;
-}
-
-export interface SectionHeading {
-  index: string;
-  label: string;
-  titleTop: string;
-  titleBottom: string;
-}
-
-export interface AboutInfo {
-  location: string;
-  experience: string;
-  focus: string;
-  availability: string;
-  bio: string;
-  profileImage: string;
 }

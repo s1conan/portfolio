@@ -1,8 +1,9 @@
 import { Server, Settings, Terminal, type LucideIcon } from "lucide-react";
 
-import { sectionHeadings, skillCategories } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { skillCategories } from "@/lib/data";
+import type { Dictionary } from "@/lib/i18n/types";
 import type { SkillIcon } from "@/types";
+import { cn } from "@/lib/utils";
 
 const skillIcons: Record<SkillIcon, LucideIcon> = {
   terminal: Terminal,
@@ -23,8 +24,12 @@ const iconRotations = [
   "group-hover:rotate-180",
 ];
 
-export function Skills() {
-  const heading = sectionHeadings.skills;
+interface SkillsProps {
+  copy: Dictionary;
+}
+
+export function Skills({ copy }: SkillsProps) {
+  const heading = copy.sectionHeadings.skills;
 
   return (
     <section id="skills" className="brutal-border-b bg-brutal-white">

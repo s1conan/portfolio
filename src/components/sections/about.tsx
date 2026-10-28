@@ -1,8 +1,15 @@
 import Image from "next/image";
-import { siteConfig, aboutInfo, sectionHeadings } from "@/lib/data";
 
-export function About() {
-  const heading = sectionHeadings.about;
+import { aboutInfo, siteConfig } from "@/lib/data";
+import type { Dictionary } from "@/lib/i18n/types";
+
+interface AboutProps {
+  copy: Dictionary;
+}
+
+export function About({ copy }: AboutProps) {
+  const heading = copy.sectionHeadings.about;
+  const about = copy.about;
 
   return (
     <section id="about" className="brutal-border-b bg-brutal-white">
@@ -50,7 +57,7 @@ export function About() {
               <div className="relative h-58 w-48 overflow-hidden border-4 border-brutal-black bg-brutal-gray">
                 <Image
                   src={aboutInfo.profileImage}
-                  alt="Profile photo"
+                  alt={copy.aria.profilePhoto}
                   fill
                   className="object-cover"
                   sizes="192px"
@@ -65,50 +72,50 @@ export function About() {
                   {siteConfig.name}
                 </h3>
                 <p className="mt-1 font-mono text-sm font-bold uppercase text-brutal-black/60">
-                  {siteConfig.role}
+                  {copy.site.role}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="border-l-4 border-brutal-yellow pl-4">
                   <span className="block font-mono text-xs font-bold uppercase text-brutal-black/60">
-                    LOCATION
+                    {about.labels.location}
                   </span>
                   <span className="font-mono text-sm font-bold uppercase text-brutal-black">
-                    {aboutInfo.location}
+                    {about.location}
                   </span>
                 </div>
 
                 <div className="border-l-4 border-brutal-yellow pl-4">
                   <span className="block font-mono text-xs font-bold uppercase text-brutal-black/60">
-                    EXPERIENCE
+                    {about.labels.experience}
                   </span>
                   <span className="font-mono text-sm font-bold uppercase text-brutal-black">
-                    {aboutInfo.experience}
+                    {about.experience}
                   </span>
                 </div>
 
                 <div className="border-l-4 border-brutal-yellow pl-4">
                   <span className="block font-mono text-xs font-bold uppercase text-brutal-black/60">
-                    FOCUS
+                    {about.labels.focus}
                   </span>
                   <span className="font-mono text-sm font-bold uppercase text-brutal-black">
-                    {aboutInfo.focus}
+                    {about.focus}
                   </span>
                 </div>
 
                 <div className="border-l-4 border-brutal-yellow pl-4">
                   <span className="block font-mono text-xs font-bold uppercase text-brutal-black/60">
-                    AVAILABILITY
+                    {about.labels.availability}
                   </span>
                   <span className="font-mono text-sm font-bold uppercase text-brutal-black">
-                    {aboutInfo.availability}
+                    {about.availability}
                   </span>
                 </div>
               </div>
 
               <p className="font-mono text-sm font-bold uppercase leading-relaxed text-brutal-black">
-                {aboutInfo.bio}
+                {about.bio}
               </p>
             </div>
           </div>

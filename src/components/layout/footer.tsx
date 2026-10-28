@@ -1,6 +1,11 @@
 import { siteConfig } from "@/lib/data";
+import type { Dictionary } from "@/lib/i18n/types";
 
-export function Footer() {
+interface FooterProps {
+  copy: Dictionary;
+}
+
+export function Footer({ copy }: FooterProps) {
   return (
     <footer className="mt-auto w-full border-t-8 border-brutal-yellow bg-brutal-black text-brutal-white">
       <div className="flex flex-col items-center justify-between gap-6 p-12 md:flex-row mx-auto max-w-7xl">
@@ -19,7 +24,7 @@ export function Footer() {
               style={{
                 backgroundColor: social.brandColor,
                 borderColor: social.brandColor,
-                color: '#ffffff',
+                color: "#ffffff",
               }}
             >
               {social.label}
@@ -28,7 +33,9 @@ export function Footer() {
         </nav>
 
         <div className="bg-brutal-gray p-2 font-mono text-sm uppercase border-4 border-brutal-white">
-          SYS.TIME: {new Date().getFullYear()}{' // '}ALL RIGHTS SECURED.
+          SYS.TIME: {new Date().getFullYear()}
+          {" // "}
+          {copy.footer.rights}
         </div>
       </div>
     </footer>

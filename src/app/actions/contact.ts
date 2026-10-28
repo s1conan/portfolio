@@ -3,8 +3,9 @@
 import { Resend } from "resend";
 
 import { siteConfig } from "@/lib/data";
+import { getDictionary, resolveLocale } from "@/lib/i18n";
 import {
-  contactSchema,
+  createContactSchema,
   type ContactFormData,
   type ContactFormState,
 } from "@/lib/validations";
@@ -41,6 +42,10 @@ export async function sendProposal(
   _prevState: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
+  const locale = resolveLocale(formData.get("locale"));
+  const copy = getDictionary(locale);
+  const contactSchema = createContactSchema(copy.contact.validation);
+
   const parsed = contactSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -53,7 +58,7 @@ export async function sendProposal(
   if (!parsed.success) {
     return {
       status: "error",
-      message: "VALIDATION FAILED — CHECK HIGHLIGHTED FIELDS.",
+      message: copy.contact.messages.invalid,
       errors: parsed.error.flatten().fieldErrors,
     };
   }
@@ -62,7 +67,7 @@ export async function sendProposal(
   if (!apiKey) {
     return {
       status: "error",
-      message: "MAIL SYSTEM OFFLINE — RESEND_API_KEY NOT CONFIGURED.",
+      message: copy.contact.messages.mailOffline,
     };
   }
 
@@ -81,7 +86,10 @@ export async function sendProposal(
     });
 
     if (!error) {
-      return { status: "success", message: "PROPOSAL RECEIVED. RESPONSE ETA: 24H." };
+      return {
+        status: "success",
+        message: copy.contact.messages.success,
+      };
     }
 
     lastError = error;
@@ -97,6 +105,6 @@ export async function sendProposal(
 
   return {
     status: "error",
-    message: `TRANSMISSION FAILED: ${lastError?.message}`,
+    message: `${copy.contact.messages.failurePrefix} ${lastError?.message ?? ""}`.trim(),
   };
 }

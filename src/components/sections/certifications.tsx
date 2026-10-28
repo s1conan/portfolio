@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 
-import { certifications, sectionHeadings } from "@/lib/data";
+import type { CertificationsSectionProps } from "@/lib/i18n/types";
 
-export function Certifications() {
-  const heading = sectionHeadings.certifications;
+export function Certifications({
+  heading,
+  certificates,
+  issuedBy,
+  aria,
+}: CertificationsSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -44,12 +48,12 @@ export function Certifications() {
     const el = scrollRef.current;
     if (!el) return;
     const cards = el.querySelectorAll("[data-cert-card]");
-    if (cards[certifications.length]) {
-      const offset = (cards[certifications.length] as HTMLElement).offsetLeft;
+    if (cards[certificates.length]) {
+      const offset = (cards[certificates.length] as HTMLElement).offsetLeft;
       const maxScroll = el.scrollWidth - el.clientWidth;
       singleSetWidthRef.current = Math.min(offset, maxScroll);
     }
-  }, []);
+  }, [certificates.length]);
 
   // Re-measure when the scroll container resizes (viewport changes, font changes, etc.)
   useEffect(() => {
@@ -88,7 +92,10 @@ export function Certifications() {
       // Reset when first extra card reaches left edge OR when scrolled to the end
       // Read ref.current live so ResizeObserver updates take effect mid-scroll
       const resetAt = singleSetWidthRef.current;
-      if (el.scrollLeft >= resetAt || el.scrollLeft + el.clientWidth >= el.scrollWidth) {
+      if (
+        el.scrollLeft >= resetAt ||
+        el.scrollLeft + el.clientWidth >= el.scrollWidth
+      ) {
         el.scrollLeft = 0;
       }
 
@@ -103,7 +110,7 @@ export function Certifications() {
         animationRef.current = null;
       }
     };
-  }, [isScrolling]);
+  }, [isScrolling, measure]);
 
   return (
     <section
@@ -129,7 +136,9 @@ export function Certifications() {
             type="button"
             onClick={() => setIsScrolling((prev) => !prev)}
             className="mt-20 cursor-pointer"
-            aria-label={isScrolling ? "Stop auto-scroll" : "Start auto-scroll"}
+            aria-label={
+              isScrolling ? aria.stopAutoScroll : aria.startAutoScroll
+            }
           >
             <ArrowRight
               size={36}
@@ -144,7 +153,7 @@ export function Certifications() {
           ref={scrollRef}
           className="col-span-1 flex w-full overflow-x-auto no-scrollbar md:col-span-9"
         >
-          {[...certifications, ...certifications.slice(0, 2)].map(
+          {[...certificates, ...certificates.slice(0, 2)].map(
             (cert, index) => (
               <a
                 key={`${cert.title}-${index}`}
@@ -170,7 +179,7 @@ export function Certifications() {
                   {cert.title}
                 </h3>
                 <p className="font-mono text-sm font-bold uppercase opacity-70">
-                  Issued by: {cert.issuer}
+                  {issuedBy} {cert.issuer}
                 </p>
               </a>
             ),

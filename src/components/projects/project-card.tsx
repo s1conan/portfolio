@@ -2,12 +2,12 @@ import { memo } from "react";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
-import type { Project } from "@/types";
+import type { ProjectView } from "@/lib/i18n/types";
 
 interface ProjectCardProps {
-  project: Project;
+  project: ProjectView;
   onSelect: () => void;
-  index?: number;
+  viewProjectLabel: string;
   priority?: boolean;
 }
 
@@ -18,7 +18,7 @@ interface ProjectCardProps {
 export const ProjectCard = memo(function ProjectCard({
   project,
   onSelect,
-  index = 0,
+  viewProjectLabel,
   priority = false,
 }: ProjectCardProps) {
   return (
@@ -30,7 +30,7 @@ export const ProjectCard = memo(function ProjectCard({
       <button
         type="button"
         onClick={onSelect}
-        aria-label={`View project ${project.title}`}
+        aria-label={`${viewProjectLabel} ${project.title}`}
         className="block h-full w-full cursor-pointer text-left"
       >
         {/* Image pane */}

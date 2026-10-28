@@ -1,8 +1,19 @@
-import { benchmarks, sectionHeadings, testimonials } from "@/lib/data";
+import type {
+  BenchmarkView,
+  SectionHeadingContent,
+} from "@/lib/i18n/types";
 
-export function Benchmarks() {
-  const heading = sectionHeadings.benchmarks;
+interface BenchmarksProps {
+  heading: SectionHeadingContent;
+  benchmarks: BenchmarkView[];
+  testimonials: string[];
+}
 
+export function Benchmarks({
+  heading,
+  benchmarks,
+  testimonials,
+}: BenchmarksProps) {
   return (
     <section id="benchmarks" className="brutal-border-b bg-brutal-white">
       <div className="grid grid-cols-1 md:grid-cols-12">
